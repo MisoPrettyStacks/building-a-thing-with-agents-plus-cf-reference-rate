@@ -3,3 +3,4 @@
 {"ts": "2026-10-07T21:55:00+00:00", "agent": "scorer", "decision": "ledger scorer armed", "detail": "Runs every 15 minutes: verifies hash-chained ledger integrity and publishes the live scoreboard.", "tag": "info"}
 {"ts": "2026-10-07T21:55:00+00:00", "agent": "retrainer", "decision": "weekly retrain armed", "detail": "Runs Sundays: champion vs challenger on held-out bars; adopts only with multiplicity-corrected significance.", "tag": "info"}
 {"ts": "2026-10-07T21:55:00+00:00", "agent": "researcher", "decision": "weekly literature scan armed", "detail": "Runs Mondays: scans arXiv q-fin and related sources for short-horizon predictability ideas; only winners survive backtesting.", "tag": "info"}
+{"ts": "2026-10-07T22:43:07+00:00", "agent": "scorer", "decision": "CF live rate refreshed", "detail": "{'live_rate': 1.4145725, 'valid_partitions': 12, 'venues_used': 4, 'trades': 2355, 'official_rr': 1.4299}", "tag": "info"}
