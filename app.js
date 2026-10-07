@@ -553,6 +553,65 @@ async function loadAgents4() {
   }
 }
 
+/* ---------------- CF Benchmarks live reference-rate panel (additive) ---------------- */
+let cfRate = null;
+function vwmJS(pairs) {
+  if (!pairs.length) return null;
+  const s = pairs.slice().sort((a, b) => a[0] - b[0]);
+  const total = s.reduce((a, t) => a + t[1], 0);
+  if (total <= 0) return null;
+  let cum = 0;
+  for (const [p, v] of s) { cum += v; if (cum >= total / 2) return p; }
+  return s[s.length - 1][0];
+}
+async function loadCFRate() {
+  try {
+    const r = await fetch(DATA_BASE + 'cf-rate.json?m=' + Math.floor(Date.now() / 60000), { cache: 'no-store' });
+    if (!r.ok) throw 0;
+    cfRate = await r.json();
+    renderCFRate();
+  } catch { /* keep previous values on screen */ }
+}
+function renderCFRate(liveVal, liveAgeS, liveNote) {
+  if (!cfRate || !$('cfLive')) return;
+  const d = cfRate;
+  if (d.official_rr && d.official_rr.value) {
+    $('cfRR').textContent = '$' + d.official_rr.value.toFixed(5);
+    const pub = new Date(d.official_rr.published);
+    $('cfRRTime').textContent = 'published ' + pub.toLocaleString([], { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }) + ' · 16:00 London fixing';
+  }
+  const v = liveVal != null ? liveVal : d.live_rate;
+  $('cfLive').textContent = v ? '$' + v.toFixed(5) : '—';
+  const ageS = liveAgeS != null ? liveAgeS : Math.max(0, Math.round((Date.now() - Date.parse(d.computed_at)) / 1000));
+  const ageTxt = ageS < 90 ? ageS + 's ago' : Math.round(ageS / 60) + 'm ago';
+  $('cfLiveAge').textContent = 'recomputed ' + ageTxt + (liveNote ? ' · ' + liveNote : ' · server, ' + (d.venues_used || '?') + ' venues');
+  if (d.trade_count) $('cfTrades').textContent = d.trade_count.toLocaleString();
+}
+async function tickCFLive() {
+  // Recompute the current partial 5-minute partition live in the browser from
+  // Coinbase + Bitstamp public trades (the two venues whose APIs allow browser
+  // fetch), blended with the server's finalized partitions (4 venues).
+  if (!cfRate || !cfRate.partitions || !cfRate.partitions.length) return;
+  try {
+    const pStart = Math.floor(Date.now() / 300000) * 300000;
+    const [cb, bs] = await Promise.all([
+      fetch('https://api.exchange.coinbase.com/products/XRP-USD/trades?limit=100').then((r) => (r.ok ? r.json() : [])).catch(() => []),
+      fetch('https://www.bitstamp.net/api/v2/transactions/xrpusd/').then((r) => (r.ok ? r.json() : [])).catch(() => []),
+    ]);
+    const trades = [];
+    for (const t of cb || []) { const ms = Date.parse(t.time); if (ms >= pStart) trades.push([parseFloat(t.price), parseFloat(t.size)]); }
+    for (const t of bs || []) { const ms = parseInt(t.date, 10) * 1000; if (ms >= pStart) trades.push([parseFloat(t.price), parseFloat(t.amount)]); }
+    const finalized = cfRate.partitions.filter((p) => p.t1 <= pStart && p.vwm != null).slice(-11);
+    const vwms = finalized.map((p) => p.vwm);
+    const cur = vwmJS(trades);
+    if (cur != null) vwms.push(cur);
+    else { const lp = cfRate.partitions[cfRate.partitions.length - 1]; if (lp && lp.vwm != null) vwms.push(lp.vwm); }
+    if (!vwms.length) return;
+    const live = vwms.reduce((a, b) => a + b, 0) / vwms.length;
+    renderCFRate(live, 0, 'live in your browser · Coinbase + Bitstamp');
+  } catch { /* keep server value on screen */ }
+}
+
 /* ---------------- boot ---------------- */
 document.querySelectorAll('#winTabs button').forEach((b) => b.addEventListener('click', () => renderScore(b.dataset.w)));
 $('dl').addEventListener('click', downloadZip);
@@ -572,11 +631,14 @@ window.addEventListener('load', () => {
   await loadSummary();
   runBacktest();
   loadAgents4();
+  loadCFRate();
   tickCountdown();
   setInterval(tickCountdown, 1000);
   setInterval(pollTicker, 5000);
   setInterval(loadCandles, 60000);
   setInterval(loadSummary, 60000);
   setInterval(loadAgents4, 300000);
+  setInterval(loadCFRate, 60000);
+  setInterval(tickCFLive, 10000);
   setInterval(schedDraw, 5000);
 })();

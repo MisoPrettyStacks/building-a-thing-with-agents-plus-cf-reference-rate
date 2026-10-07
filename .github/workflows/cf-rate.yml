@@ -1,0 +1,73 @@
+name: cf-reference-rate
+
+# Scorer-owned data feed: every 5 minutes, recompute the live CF-methodology XRP
+# reference rate (12 x 5-min partitions, volume-weighted median per partition pooled
+# across Coinbase/Kraken/Bitstamp/Gemini, equally-weighted mean) over the trailing
+# 60 minutes, refresh the official daily fixing from CF Benchmarks' public index
+# page, and publish data/cf-rate.json to the `data` branch. Never overwrites a good
+# file with a degraded one. Logs every run to the agent log on main.
+on:
+  schedule:
+    - cron: "4,19,34,49 * * * *"
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+
+concurrency:
+  group: cf-rate-data
+  cancel-in-progress: false
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Prepare data branch
+        run: |
+          git config --global user.name "cf-rate-bot"
+          git config --global user.email "cf-rate-bot@users.noreply.github.com"
+          REMOTE="https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git"
+          if git ls-remote --exit-code --heads "$REMOTE" data >/dev/null 2>&1; then
+            git clone --depth 1 --branch data "$REMOTE" data-branch
+          else
+            mkdir data-branch && cd data-branch && git init -q -b data && git remote add origin "$REMOTE"
+          fi
+      - name: Recompute live CF-methodology rate
+        id: cf
+        run: |
+          OUT=$(node scripts/cf-live.mjs --data ./data-branch 2>cf-err.log); CODE=$?
+          echo "$OUT" | tail -1 > cf-out.json
+          cat cf-out.json
+          echo "status=$(python3 -c "import json; print(json.load(open('cf-out.json')).get('status','error'))")" >> "$GITHUB_OUTPUT"
+          echo "detail=$(python3 -c "import json; d=json.load(open('cf-out.json')); print(str({k:d.get(k) for k in ('live_rate','valid_partitions','venues_used','trades','official_rr')}).replace(chr(34),chr(39)))" 2>/dev/null || echo "see logs")" >> "$GITHUB_OUTPUT"
+          if [ $CODE -ne 0 ]; then echo "script failed"; cat cf-err.log; exit 1; fi
+      - name: Publish data branch
+        run: |
+          cd data-branch
+          git add cf-rate.json cf-trades.json
+          git diff --cached --quiet || git commit -q -m "cf-rate: live methodology update"
+          git push -q origin data || { git pull --rebase origin data && git push -q origin data; }
+      - name: Append to agent log
+        if: always()
+        run: |
+          git config --global user.name "scorer-bot"
+          git config --global user.email "noreply@github.com"
+          git clone --depth 1 "https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git" repo-main
+          cd repo-main
+          mkdir -p data
+          TS=$(date -u +%FT%T+00:00)
+          STATUS="${{ steps.cf.outputs.status }}"
+          DETAIL="${{ steps.cf.outputs.detail }}"
+          if [ "$STATUS" = "ok" ]; then TAG="info"; DEC="CF live rate refreshed";
+          elif [ "$STATUS" = "degraded-keep-previous" ]; then TAG="warn"; DEC="CF feed degraded, kept last good";
+          else TAG="alarm"; DEC="CF feed run failed"; fi
+          printf '%s\n' "{\"ts\": \"$TS\", \"agent\": \"scorer\", \"decision\": \"$DEC\", \"detail\": \"$DETAIL\", \"tag\": \"$TAG\"}" >> data/agent_log.jsonl
+          git add data/agent_log.jsonl
+          git diff --cached --quiet || git commit -q -m "scorer: $DEC"
+          git pull --rebase origin main || true
+          git push -q origin main || true

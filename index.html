@@ -28,7 +28,7 @@
 </header>
 
 <nav class="toc">
-  <a href="#live">Live</a><a href="#score">Live accuracy</a><a href="#backtest">Backtest</a><a href="#agent">Agent</a><a href="#agents">Agents</a>
+  <a href="#live">Live</a><a href="#cfref">CF reference</a><a href="#score">Live accuracy</a><a href="#backtest">Backtest</a><a href="#agent">Agent</a><a href="#agents">Agents</a>
   <a href="#method">Methodology</a><a href="#integrity">Integrity &amp; source</a><a href="#refs">References</a>
 </nav>
 
@@ -72,6 +72,18 @@
       <tr><th>P(down)</th><td id="wPdown">—</td></tr>
     </table>
   </div>
+</section>
+
+<section id="cfref" class="card">
+  <h2>CF Benchmarks reference rate — live</h2>
+  <p class="muted" style="margin-top:0">A live implementation of CF Benchmarks' published XRP reference-rate methodology, recomputed continuously from public trade data. The official once-daily CF fixing is shown alongside for reference.</p>
+  <div class="grid g4">
+    <div class="stat"><div class="k">Live methodology rate</div><div class="v" id="cfLive">—</div><div class="s" id="cfLiveAge">loading…</div></div>
+    <div class="stat"><div class="k">Official daily fixing (XRPUSD_RR)</div><div class="v" id="cfRR">—</div><div class="s" id="cfRRTime">—</div></div>
+    <div class="stat"><div class="k">Trades in window</div><div class="v" id="cfTrades">—</div><div class="s">4 venues · trailing 60 min</div></div>
+    <div class="stat"><div class="k">Method</div><div class="v" style="font-size:15px">12 × 5-min VWM → mean</div><div class="s"><a href="https://docs.cfbenchmarks.com/CME%20CF%20Reference%20Rates%20Methodology.pdf" target="_blank" rel="noopener">CF methodology PDF</a></div></div>
+  </div>
+  <p class="muted" style="font-size:12px;margin-bottom:0">How it works: every 5 minutes the runner pulls recent XRP-USD trades from Coinbase, Kraken, Bitstamp and Gemini — four of the six official CF constituent venues (LMAX Digital and itBit have no free public feed and are excluded) — buckets the trailing 60 minutes into twelve 5-minute partitions, takes the volume-weighted median trade price per partition pooled across venues, and averages the twelve medians, exactly the calculation in CF's methodology. Your browser re-runs the current partial partition every 10 seconds from live Coinbase + Bitstamp trades, so the number above is seconds old. The official fixing publishes once daily at 16:00 London time; this page's live value is our implementation of the same calculation, not the official fixing.</p>
 </section>
 
 <section id="score" class="card">
