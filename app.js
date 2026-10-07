@@ -545,9 +545,9 @@ async function loadAgents4() {
       const genAge = sj.generated_at ? (Date.now() - new Date(sj.generated_at).getTime()) / 60000 : 999;
       set('h4_fc', genAge < 15 ? '● live' : '● stale', 'forecast ' + ago(sj.generated_at), genAge < 15);
     } catch { set('h4_fc', '● ?', '', null); }
-    set('h4_sc', last.scorer ? '● live' : '● armed', last.scorer ? 'last run ' + ago(last.scorer) : 'runs every 15 min', !!last.scorer);
-    set('h4_rt', last.retrainer ? '● armed' : '● armed', last.retrainer ? 'last run ' + ago(last.retrainer) : 'runs Sundays', true);
-    set('h4_rs', last.researcher ? '● armed' : '● armed', last.researcher ? 'last scan ' + ago(last.researcher) : 'runs Mondays', true);
+    set('h4_sc', last.scorer ? '● live' : '● standby', last.scorer ? 'last run ' + ago(last.scorer) : 'runs every 15 min', !!last.scorer);
+    set('h4_rt', last.retrainer ? '● standby' : '● standby', last.retrainer ? 'last run ' + ago(last.retrainer) : 'runs Sundays', true);
+    set('h4_rs', last.researcher ? '● standby' : '● standby', last.researcher ? 'last scan ' + ago(last.researcher) : 'runs Mondays', true);
   } catch {
     logEl.innerHTML = '<div class="empty">Agent log unavailable.</div>';
   }
