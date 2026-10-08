@@ -11,3 +11,4 @@
 {"ts": "2026-10-08T09:08:24+00:00", "agent": "scorer", "decision": "ledger healthy", "detail": "summary 8m old, chain_ok=True, forecasts=123", "tag": "info"}
 {"ts": "2026-10-08T09:10:11+00:00", "agent": "scorer", "decision": "CF live rate refreshed", "detail": "{'live_rate': 1.409981666666667, 'valid_partitions': 12, 'venues_used': 4, 'trades': 1332, 'official_rr': 1.4299}", "tag": "info"}
 {"ts": "2026-10-08T16:36:23+00:00", "agent": "scorer", "decision": "ledger healthy", "detail": "summary 1m old, chain_ok=True, forecasts=183", "tag": "info"}
+{"ts": "2026-10-08T16:36:32+00:00", "agent": "scorer", "decision": "CF live rate refreshed", "detail": "{'live_rate': 1.3507241666666667, 'valid_partitions': 12, 'venues_used': 3, 'trades': 4366, 'official_rr': 1.40287}", "tag": "info"}
