@@ -16,3 +16,4 @@
 {"ts": "2026-10-08T21:28:46+00:00", "agent": "scorer", "decision": "ledger healthy", "detail": "summary 3m old, chain_ok=True, forecasts=199", "tag": "info"}
 {"ts": "2026-10-08T21:33:56+00:00", "agent": "scorer", "decision": "CF live rate refreshed", "detail": "{'live_rate': 1.3775025000000003, 'valid_partitions': 12, 'venues_used': 4, 'trades': 2074, 'official_rr': 1.40287}", "tag": "info"}
 {"ts": "2026-10-09T01:20:09+00:00", "agent": "forecaster", "decision": "forecast loop completed", "detail": "5h runner finished: issued 15-minute probabilities every 5 minutes from closed Coinbase bars.", "tag": "info"}
+{"ts": "2026-10-09T01:22:31+00:00", "agent": "scorer", "decision": "ledger healthy", "detail": "summary 2m old, chain_ok=True, forecasts=246", "tag": "info"}
