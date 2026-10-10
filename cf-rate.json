@@ -1,0 +1,114 @@
+{
+ "computed_at": "2026-10-10T17:26:49.628Z",
+ "live_rate": 1.4039183333333332,
+ "method": "Live implementation of the CME CF Reference Rates Methodology: 12 x 5-minute partitions over the trailing 60 minutes; volume-weighted median trade price per partition pooled across venues; equally-weighted mean of the partition medians.",
+ "methodology_pdf": "https://docs.cfbenchmarks.com/CME%20CF%20Reference%20Rates%20Methodology.pdf",
+ "venues": [
+  "coinbase",
+  "kraken",
+  "bitstamp",
+  "gemini"
+ ],
+ "venues_excluded": "LMAX Digital and itBit are official CF constituents with no free public market-data API; excluded (documented, not faked).",
+ "venues_used": 4,
+ "venue_status": [
+  "coinbase:ok(299)",
+  "kraken:ok(722)",
+  "bitstamp:ok(326)",
+  "gemini:ok(430)"
+ ],
+ "partitions": [
+  {
+   "t0": 1791649500000,
+   "t1": 1791649800000,
+   "vwm": 1.40448,
+   "trades": 102,
+   "volume_xrp": 47174.56
+  },
+  {
+   "t0": 1791649800000,
+   "t1": 1791650100000,
+   "vwm": 1.40465,
+   "trades": 92,
+   "volume_xrp": 13779.54
+  },
+  {
+   "t0": 1791650100000,
+   "t1": 1791650400000,
+   "vwm": 1.40495,
+   "trades": 75,
+   "volume_xrp": 23033.17
+  },
+  {
+   "t0": 1791650400000,
+   "t1": 1791650700000,
+   "vwm": 1.40508,
+   "trades": 89,
+   "volume_xrp": 14754.1
+  },
+  {
+   "t0": 1791650700000,
+   "t1": 1791651000000,
+   "vwm": 1.40454,
+   "trades": 104,
+   "volume_xrp": 35034.5
+  },
+  {
+   "t0": 1791651000000,
+   "t1": 1791651300000,
+   "vwm": 1.40449,
+   "trades": 97,
+   "volume_xrp": 15205.74
+  },
+  {
+   "t0": 1791651300000,
+   "t1": 1791651600000,
+   "vwm": 1.40302,
+   "trades": 131,
+   "volume_xrp": 38324.55
+  },
+  {
+   "t0": 1791651600000,
+   "t1": 1791651900000,
+   "vwm": 1.4023,
+   "trades": 114,
+   "volume_xrp": 25877.16
+  },
+  {
+   "t0": 1791651900000,
+   "t1": 1791652200000,
+   "vwm": 1.40363,
+   "trades": 114,
+   "volume_xrp": 17825.91
+  },
+  {
+   "t0": 1791652200000,
+   "t1": 1791652500000,
+   "vwm": 1.40371,
+   "trades": 98,
+   "volume_xrp": 6383.6
+  },
+  {
+   "t0": 1791652500000,
+   "t1": 1791652800000,
+   "vwm": 1.40307,
+   "trades": 144,
+   "volume_xrp": 285899.54
+  },
+  {
+   "t0": 1791652800000,
+   "t1": 1791653100000,
+   "vwm": 1.4031,
+   "trades": 195,
+   "volume_xrp": 107537.32
+  }
+ ],
+ "trade_count": 1435,
+ "official_rr": {
+  "value": 1.40561,
+  "change_pct": 1.61,
+  "published": "2026-10-10T15:00:00.000Z",
+  "source": "https://www.cfbenchmarks.com/data/indices/XRPUSD_RR"
+ },
+ "note": "This is a live re-implementation of CF Benchmarks’ published methodology, not the official CF fixing. The official fixing publishes once daily at 16:00 London time."
+}
